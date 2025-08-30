@@ -66,10 +66,16 @@
   <h1>🔎 البحث عن نتيجة الطالب</h1>
   <div class="search-box">
     <select id="classSelect">
+      <!-- المرحلة الإعدادية -->
       <option value="اولي-اعدادي">الأولى الإعدادية</option>
       <option value="تانيه-اعدادي">الثانية الإعدادية</option>
-      <option value="تالته-اعدادي" selected>الثالثة الإعدادية</option>
+      <option value="تالته-اعدادي">الثالثة الإعدادية</option>
+      <!-- المرحلة الثانوية -->
+      <option value="اولي-ثانوي">الأولى الثانوية</option>
+      <option value="تانيه-ثانوي">الثانية الثانوية</option>
+      <option value="تالته-ثانوي">الثالثة الثانوية</option>
     </select>
+
     <input type="text" id="searchInput" placeholder="اكتب اسم الطالب...">
     <ul id="results"></ul>
     <button id="showResult">📊 عرض النتيجة</button>
@@ -77,29 +83,39 @@
 
   <script>
     let studentsData = {};
+    let studentNames = [];
     let selectedStudent = "";
+
+    // دالة لتوحيد النصوص (إزالة الفروق بين الألف - أ إ آ ا)
+    function normalizeArabic(text) {
+      return text.replace(/[أإآ]/g, "ا");
+    }
 
     // تحميل ملف JSON
     fetch("students_results.json")
       .then(response => response.json())
       .then(data => {
         studentsData = data;
-      });
+        studentNames = Object.keys(data);
+        console.log("✅ تم تحميل أسماء الطلاب:", studentNames);
+      })
+      .catch(err => console.error("❌ خطأ في تحميل JSON:", err));
 
     const searchInput = document.getElementById("searchInput");
     const resultsList = document.getElementById("results");
     const classSelect = document.getElementById("classSelect");
     const showResultBtn = document.getElementById("showResult");
 
+    // البحث
     searchInput.addEventListener("input", function() {
-      const query = this.value.trim().toLowerCase();
+      const query = normalizeArabic(this.value.trim());
       resultsList.innerHTML = "";
       selectedStudent = "";
 
       if (query.length === 0) return;
 
-      let matches = Object.keys(studentsData).filter(name =>
-        name.toLowerCase().includes(query)
+      let matches = studentNames.filter(name =>
+        normalizeArabic(name).includes(query)
       );
 
       matches.slice(0, 10).forEach(name => {
@@ -114,6 +130,7 @@
       });
     });
 
+    // عرض النتيجة
     showResultBtn.addEventListener("click", function() {
       const selectedClass = classSelect.value;
       if (selectedStudent && selectedClass) {
