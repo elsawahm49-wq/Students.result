@@ -84,11 +84,9 @@
   <script>
     let studentsData = {};
     let studentNames = [];
-    let selectedStudent = "";
 
-    // دالة لتوحيد النصوص (إزالة الفروق بين الألف - أ إ آ ا)
     function normalizeArabic(text) {
-      return text.replace(/[أإآ]/g, "ا");
+      return text.replace(/[أإآ]/g, "ا").replace(/\s+/g, " ").trim();
     }
 
     // تحميل ملف JSON
@@ -106,11 +104,10 @@
     const classSelect = document.getElementById("classSelect");
     const showResultBtn = document.getElementById("showResult");
 
-    // البحث
-    searchInput.addEventListener("input", function() {
-      const query = normalizeArabic(this.value.trim());
+    // البحث التلقائي
+    searchInput.addEventListener("input", function () {
+      const query = normalizeArabic(this.value);
       resultsList.innerHTML = "";
-      selectedStudent = "";
 
       if (query.length === 0) return;
 
@@ -121,9 +118,8 @@
       matches.slice(0, 10).forEach(name => {
         const li = document.createElement("li");
         li.textContent = name;
-        li.addEventListener("click", function() {
+        li.addEventListener("click", function () {
           searchInput.value = name;
-          selectedStudent = name;
           resultsList.innerHTML = "";
         });
         resultsList.appendChild(li);
@@ -131,13 +127,33 @@
     });
 
     // عرض النتيجة
-    showResultBtn.addEventListener("click", function() {
+    showResultBtn.addEventListener("click", function () {
       const selectedClass = classSelect.value;
-      if (selectedStudent && selectedClass) {
-        window.location.href = `result.html?name=${encodeURIComponent(selectedStudent)}&class=${selectedClass}`;
-      } else {
-        alert("⚠️ من فضلك اختر اسم الطالب والصف الدراسي");
+      const enteredName = searchInput.value.trim();
+
+      if (!enteredName || !selectedClass) {
+        alert("⚠️ من فضلك اكتب اسم الطالب واختر الصف الدراسي.");
+        return;
       }
+
+      const normalizedEnteredName = normalizeArabic(enteredName);
+      const matchedName = studentNames.find(name =>
+        normalizeArabic(name) === normalizedEnteredName
+      );
+
+      if (!matchedName) {
+        alert("❌ الاسم غير موجود في قاعدة البيانات. تأكد من كتابته بشكل صحيح أو اختاره من القائمة.");
+        return;
+      }
+
+      // تحقق من وجود درجات لهذا الصف
+      if (!studentsData[matchedName][selectedClass]) {
+        alert("⚠️ لا توجد نتائج لهذا الطالب في الصف الدراسي المختار.");
+        return;
+      }
+
+      // كل شيء تمام → انقل لصفحة النتيجة
+      window.location.href = `result.html?name=${encodeURIComponent(matchedName)}&class=${selectedClass}`;
     });
   </script>
 </body>
