@@ -46,16 +46,46 @@
     .verygood { color: blue; }
     .good { color: orange; }
     .weak { color: red; }
+
+    /* زرار الرجوع */
+    .back-btn {
+      display: inline-block;
+      margin: 25px auto;
+      padding: 12px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+    .back-btn:hover {
+      background: #1a242f;
+    }
   </style>
 </head>
 <body>
   <h1>📊 نتيجة الطالب</h1>
   <div id="studentResult"></div>
 
+  <a href="index.html" class="back-btn">🔙 رجوع للبحث</a>
+
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const studentName = urlParams.get("name");
     const studentClass = urlParams.get("class");
+
+    const classNames = {
+      "اولي-اعدادي": "الأولى الإعدادية",
+      "تانيه-اعدادي": "الثانية الإعدادية",
+      "تالته-اعدادي": "الثالثة الإعدادية",
+      "اولي-ثانوي": "الأولى الثانوية",
+      "تانيه-ثانوي": "الثانية الثانوية",
+      "تالته-ثانوي": "الثالثة الثانوية"
+    };
 
     async function loadData() {
       try {
@@ -78,16 +108,29 @@
             table += `<tr><td>المادة ${i+1}</td><td>${got} / ${max}</td></tr>`;
           });
 
+          let percent = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+
+          table += `
+            <tr style="font-weight:bold; background:#eef;">
+              <td>📌 المجموع الكلي</td>
+              <td>${total} / ${maxTotal} (${percent.toFixed(2)}%)</td>
+            </tr>
+          `;
+
           table += "</table>";
 
-          let percent = (total / maxTotal) * 100;
           let status = "";
           if (percent >= 85) status = `<div class="grade excellent">ممتاز</div>`;
           else if (percent >= 70) status = `<div class="grade verygood">جيد جدًا</div>`;
           else if (percent >= 50) status = `<div class="grade good">جيد</div>`;
           else status = `<div class="grade weak">ضعيف</div>`;
 
-          container.innerHTML = `<h2>${studentName}</h2><h3>${studentClass}</h3>` + table + status;
+          container.innerHTML = `
+            <h2>${studentName}</h2>
+            <h3>${classNames[studentClass] || studentClass}</h3>
+            ${table}
+            ${status}
+          `;
 
         } else {
           container.innerHTML = `<p style="color:red">⚠️ الطالب أو الصف غير موجود</p>`;
