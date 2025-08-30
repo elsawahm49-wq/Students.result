@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>درجات الطلاب</title>
+  <title>البحث عن نتيجة الطالب</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,65 +19,78 @@
       padding: 15px;
       margin: 0;
     }
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      width: 80%;
-      background: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    th, td {
-      border: 1px solid #ddd;
+    input {
       padding: 10px;
+      margin: 20px 10px;
+      width: 250px;
+      font-size: 16px;
     }
-    th {
+    button {
+      padding: 10px 20px;
       background: #34495e;
       color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
     }
-    tr:nth-child(even) {
-      background: #f9f9f9;
+    button:hover {
+      background: #2c3e50;
     }
-    tr:hover {
-      background: #ecf0f1;
-      transition: 0.3s;
-    }
-    .high {
-      color: green;
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
       font-weight: bold;
     }
-    .medium {
-      color: goldenrod;
-      font-weight: bold;
-    }
-    .low {
-      color: red;
-      font-weight: bold;
-    }
+    .high { color: green; }
+    .medium { color: goldenrod; }
+    .low { color: red; }
   </style>
 </head>
 <body>
-  <h1>نتائج الطلاب</h1>
-  <table>
-    <tr>
-      <th>اسم الطالب</th>
-      <th>الدرجة</th>
-    </tr>
-    <tr>
-      <td>أحمد علي</td>
-      <td class="high">95</td>
-    </tr>
-    <tr>
-      <td>سارة محمد</td>
-      <td class="high">88</td>
-    </tr>
-    <tr>
-      <td>محمود يوسف</td>
-      <td class="medium">76</td>
-    </tr>
-    <tr>
-      <td>ليلى خالد</td>
-      <td class="low">54</td>
-    </tr>
-  </table>
+  <h1>البحث عن نتيجة الطالب</h1>
+  <input type="text" id="studentName" placeholder="اكتب اسم الطالب هنا">
+  <button onclick="searchStudent()">بحث</button>
+
+  <div id="result"></div>
+
+  <script>
+    // بيانات الطلاب
+    const students = {
+      "أحمد علي": 29,
+      "سارة محمد": 27,
+      "محمود يوسف": 20,
+      "ليلى خالد": 12,
+      "عمر حسن": 18,
+      "ندى إبراهيم": 30,
+      "خالد سمير": 9,
+      "فاطمة عمر": 16,
+      "يوسف عادل": 25,
+      "هبة شريف": 19,
+      "إسلام فاروق": 13,
+      "منة الله عماد": 28,
+      "محمد طارق": 21,
+      "ريم عصام": 11,
+      "عبدالله كريم": 17,
+      "حنان محمود": 26,
+      "أدهم ياسر": 10,
+      "شهد وليد": 23,
+      "بلال أحمد": 30,
+      "إسراء جمال": 22
+    };
+
+    function searchStudent() {
+      const name = document.getElementById("studentName").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (students[name] !== undefined) {
+        let grade = students[name];
+        let cssClass = grade >= 25 ? "high" : grade >= 15 ? "medium" : "low";
+        resultDiv.innerHTML = `<span class="${cssClass}">${name} : ${grade} / 30</span>`;
+      } else {
+        resultDiv.innerHTML = `<span style="color:red">⚠️ الطالب غير موجود</span>`;
+      }
+    }
+  </script>
 </body>
 </html>
