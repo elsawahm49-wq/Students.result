@@ -37,14 +37,6 @@
     button:hover {
       background: #2c3e50;
     }
-    #result {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .high { color: green; }
-    .medium { color: goldenrod; }
-    .low { color: red; }
   </style>
 </head>
 <body>
@@ -52,43 +44,40 @@
   <input type="text" id="studentName" placeholder="اكتب اسم الطالب هنا">
   <button onclick="searchStudent()">بحث</button>
 
-  <div id="result"></div>
-
   <script>
-    // بيانات الطلاب
+    // بيانات 20 طالب (٨ حصص × ٣٠)
     const students = {
-      "أحمد علي": 29,
-      "سارة محمد": 27,
-      "محمود يوسف": 20,
-      "ليلى خالد": 12,
-      "عمر حسن": 18,
-      "ندى إبراهيم": 30,
-      "خالد سمير": 9,
-      "فاطمة عمر": 16,
-      "يوسف عادل": 25,
-      "هبة شريف": 19,
-      "إسلام فاروق": 13,
-      "منة الله عماد": 28,
-      "محمد طارق": 21,
-      "ريم عصام": 11,
-      "عبدالله كريم": 17,
-      "حنان محمود": 26,
-      "أدهم ياسر": 10,
-      "شهد وليد": 23,
-      "بلال أحمد": 30,
-      "إسراء جمال": 22
+      "أحمد علي": [28,25,27,29,30,26,28,27],
+      "سارة محمد": [20,22,24,21,25,23,22,24],
+      "محمود يوسف": [15,18,20,17,16,19,20,18],
+      "ندى إبراهيم": [30,30,29,30,28,30,29,30],
+      "خالد سمير": [10,12,15,14,11,13,12,10],
+      "ريم حسن": [25,24,26,27,28,25,26,24],
+      "عمر فؤاد": [18,20,22,19,21,20,22,23],
+      "ليلى أحمد": [29,30,30,29,30,30,29,30],
+      "محمد سعيد": [14,16,15,17,18,16,15,14],
+      "داليا كمال": [23,24,22,25,23,24,22,23],
+      "يوسف حمدي": [19,21,20,18,19,20,21,22],
+      "هالة سمير": [27,28,29,28,27,29,28,30],
+      "سامح عادل": [16,15,17,18,16,15,17,16],
+      "فاطمة خالد": [24,25,26,24,25,26,25,24],
+      "إياد عمر": [22,20,23,22,21,23,22,20],
+      "ملك سامي": [30,29,30,30,29,30,30,29],
+      "أدهم جمال": [12,14,13,12,15,14,13,12],
+      "صفاء طارق": [26,27,28,27,26,28,27,26],
+      "حسن علي": [20,19,21,20,22,21,20,19],
+      "هند شريف": [28,29,27,28,29,28,29,28]
     };
 
     function searchStudent() {
       const name = document.getElementById("studentName").value.trim();
-      const resultDiv = document.getElementById("result");
 
       if (students[name] !== undefined) {
-        let grade = students[name];
-        let cssClass = grade >= 25 ? "high" : grade >= 15 ? "medium" : "low";
-        resultDiv.innerHTML = `<span class="${cssClass}">${name} : ${grade} / 30</span>`;
+        localStorage.setItem("studentName", name);
+        localStorage.setItem("grades", JSON.stringify(students[name]));
+        window.location.href = "result.html";
       } else {
-        resultDiv.innerHTML = `<span style="color:red">⚠️ الطالب غير موجود</span>`;
+        alert("⚠️ الطالب غير موجود");
       }
     }
   </script>
