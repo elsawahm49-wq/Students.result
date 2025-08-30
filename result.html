@@ -42,6 +42,11 @@
       margin-top: 20px;
       font-weight: bold;
     }
+    .percent {
+      font-size: 20px;
+      margin-top: 10px;
+      color: #333;
+    }
     .excellent { color: green; }
     .verygood { color: blue; }
     .good { color: orange; }
@@ -53,7 +58,7 @@
   <div id="studentResult"></div>
 
   <script>
-    // قراءة الاسم من رابط الصفحة
+    // قراءة اسم الطالب من الرابط (مثال: result.html?name=أحمد علي)
     const urlParams = new URLSearchParams(window.location.search);
     const studentName = urlParams.get("name");
 
@@ -64,7 +69,7 @@
 
         const container = document.getElementById("studentResult");
 
-        if (data[studentName]) {
+        if (studentName && data[studentName]) {
           const grades = data[studentName];
 
           let table = "<table><tr><th>الحصة</th><th>الدرجة</th></tr>";
@@ -82,21 +87,23 @@
 
           // حساب النسبة المئوية
           let percent = (total / maxTotal) * 100;
+          let percentText = `<div class="percent">النسبة النهائية: ${percent.toFixed(2)}%</div>`;
           let status = "";
           if (percent >= 85) status = `<div class="grade excellent">ممتاز</div>`;
           else if (percent >= 70) status = `<div class="grade verygood">جيد جدًا</div>`;
           else if (percent >= 50) status = `<div class="grade good">جيد</div>`;
           else status = `<div class="grade weak">ضعيف</div>`;
 
-          container.innerHTML = `<h2>${studentName}</h2>` + table + status;
+          container.innerHTML = `<h2>${studentName}</h2>` + table + percentText + status;
 
         } else {
-          document.getElementById("studentResult").innerHTML = 
-            `<p style="color:red">⚠️ الطالب غير موجود</p>`;
+          container.innerHTML = `<p style="color:red">⚠️ الطالب غير موجود</p>`;
         }
 
       } catch (e) {
         console.error("Error loading data:", e);
+        document.getElementById("studentResult").innerHTML = 
+          `<p style="color:red">⚠️ خطأ في تحميل الملف</p>`;
       }
     }
 
