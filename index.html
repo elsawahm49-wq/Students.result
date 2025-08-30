@@ -24,13 +24,23 @@
       width: 80%;
       max-width: 500px;
     }
-    input, select {
+    input, select, button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
+    }
+    button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #219150;
     }
     ul {
       list-style: none;
@@ -56,14 +66,18 @@
   <h1>🔎 البحث عن نتيجة الطالب</h1>
   <div class="search-box">
     <select id="classSelect">
-      <option value="تالته-اعدادي">الثالثة الإعدادية</option>
+      <option value="اولي-اعدادي">الأولى الإعدادية</option>
+      <option value="تانيه-اعدادي">الثانية الإعدادية</option>
+      <option value="تالته-اعدادي" selected>الثالثة الإعدادية</option>
     </select>
     <input type="text" id="searchInput" placeholder="اكتب اسم الطالب...">
     <ul id="results"></ul>
+    <button id="showResult">📊 عرض النتيجة</button>
   </div>
 
   <script>
     let studentsData = {};
+    let selectedStudent = "";
 
     // تحميل ملف JSON
     fetch("students_results.json")
@@ -75,10 +89,12 @@
     const searchInput = document.getElementById("searchInput");
     const resultsList = document.getElementById("results");
     const classSelect = document.getElementById("classSelect");
+    const showResultBtn = document.getElementById("showResult");
 
     searchInput.addEventListener("input", function() {
       const query = this.value.trim().toLowerCase();
       resultsList.innerHTML = "";
+      selectedStudent = "";
 
       if (query.length === 0) return;
 
@@ -90,11 +106,21 @@
         const li = document.createElement("li");
         li.textContent = name;
         li.addEventListener("click", function() {
-          const selectedClass = classSelect.value;
-          window.location.href = `result.html?name=${encodeURIComponent(name)}&class=${selectedClass}`;
+          searchInput.value = name;
+          selectedStudent = name;
+          resultsList.innerHTML = "";
         });
         resultsList.appendChild(li);
       });
+    });
+
+    showResultBtn.addEventListener("click", function() {
+      const selectedClass = classSelect.value;
+      if (selectedStudent && selectedClass) {
+        window.location.href = `result.html?name=${encodeURIComponent(selectedStudent)}&class=${selectedClass}`;
+      } else {
+        alert("⚠️ من فضلك اختر اسم الطالب والصف الدراسي");
+      }
     });
   </script>
 </body>
