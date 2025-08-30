@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بحث عن نتيجة الطالب</title>
+  <title>البحث عن نتيجة الطالب</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,138 +19,83 @@
       padding: 15px;
       margin: 0;
     }
-    .container {
+    .search-box {
       margin: 30px auto;
-      width: 90%;
+      width: 80%;
       max-width: 500px;
-      position: relative;
     }
-    input, select, button {
-      padding: 10px;
-      margin: 5px 0;
+    input, select {
       width: 100%;
+      padding: 10px;
+      margin: 10px 0;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
     }
-    button {
-      background: #2c3e50;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background: #34495e;
-    }
-    .suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
       background: white;
-      border: 1px solid #ccc;
-      border-top: none;
-      max-height: 250px;
+      border: 1px solid #ddd;
+      max-height: 200px;
       overflow-y: auto;
-      z-index: 1000;
+      border-radius: 8px;
     }
-    .suggestions div {
-      padding: 8px;
+    li {
+      padding: 10px;
       cursor: pointer;
-      text-align: right;
+      border-bottom: 1px solid #eee;
     }
-    .suggestions div:hover {
-      background: #f0f0f0;
+    li:hover {
+      background: #f1f1f1;
     }
   </style>
 </head>
 <body>
-  <h1>البحث عن نتيجة الطالب</h1>
-  <div class="container">
-    <input type="text" id="studentInput" placeholder="اكتب اسم الطالب...">
-    <div id="suggestions" class="suggestions"></div>
-
+  <h1>🔎 البحث عن نتيجة الطالب</h1>
+  <div class="search-box">
     <select id="classSelect">
-      <option value="">اختر الصف الدراسي</option>
+      <option value="تالته-اعدادي">الثالثة الإعدادية</option>
     </select>
-
-    <button onclick="goToResult()">عرض النتيجة</button>
+    <input type="text" id="searchInput" placeholder="اكتب اسم الطالب...">
+    <ul id="results"></ul>
   </div>
 
   <script>
-    const inputBox = document.getElementById("studentInput");
-    const suggestionsBox = document.getElementById("suggestions");
+    let studentsData = {};
+
+    // تحميل ملف JSON
+    fetch("students_results.json")
+      .then(response => response.json())
+      .then(data => {
+        studentsData = data;
+      });
+
+    const searchInput = document.getElementById("searchInput");
+    const resultsList = document.getElementById("results");
     const classSelect = document.getElementById("classSelect");
 
-    let students = [];
-    let classes = new Set();
+    searchInput.addEventListener("input", function() {
+      const query = this.value.trim().toLowerCase();
+      resultsList.innerHTML = "";
 
-    async function loadStudents() {
-      const response = await fetch("students_results.json");
-      const data = await response.json();
-      
-      // جمع أسماء الطلاب
-      students = Object.keys(data);
+      if (query.length === 0) return;
 
-      // جمع الصفوف
-      Object.values(data).forEach(studentClasses => {
-        Object.keys(studentClasses).forEach(cls => classes.add(cls));
-      });
+      let matches = Object.keys(studentsData).filter(name =>
+        name.toLowerCase().includes(query)
+      );
 
-      // ترتيب الصفوف
-      let sortedClasses = Array.from(classes).sort((a, b) => a.localeCompare(b, "ar"));
-
-      // إضافة الصفوف للقائمة
-      sortedClasses.forEach(cls => {
-        const option = document.createElement("option");
-        option.value = cls;
-        option.textContent = cls.replace(/-/g, " "); // عرض أوضح
-        classSelect.appendChild(option);
-      });
-    }
-
-    // البحث عن الأسماء
-    inputBox.addEventListener("input", () => {
-      const query = inputBox.value.toLowerCase();
-      suggestionsBox.innerHTML = "";
-
-      if (!query) return;
-
-      const matches = students.filter(name => name.toLowerCase().includes(query));
-      matches.slice(0, 10).forEach(match => {
-        const div = document.createElement("div");
-        div.textContent = match;
-        div.onclick = () => {
-          inputBox.value = match;
-          suggestionsBox.innerHTML = "";
-        };
-        suggestionsBox.appendChild(div);
+      matches.slice(0, 10).forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        li.addEventListener("click", function() {
+          const selectedClass = classSelect.value;
+          window.location.href = `result.html?name=${encodeURIComponent(name)}&class=${selectedClass}`;
+        });
+        resultsList.appendChild(li);
       });
     });
-
-    // الذهاب إلى صفحة النتيجة
-    function goToResult() {
-      const input = inputBox.value.trim();
-      const className = classSelect.value;
-      const matchedName = students.find(name => name.toLowerCase() === input.toLowerCase());
-
-      if (!matchedName) {
-        alert("⚠️ من فضلك اختر اسم صحيح من القائمة");
-        return;
-      }
-      if (!className) {
-        alert("⚠️ من فضلك اختر الصف الدراسي");
-        return;
-      }
-
-      window.location.href =
-        "result.html?name=" +
-        encodeURIComponent(matchedName) +
-        "&class=" +
-        encodeURIComponent(className);
-    }
-
-    loadStudents();
   </script>
 </body>
 </html>
