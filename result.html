@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نتيجة الطالب</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      text-align: center;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      margin: 0 0 20px 0;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+    th {
+      background: #34495e;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f4f4f4;
+    }
+    #final {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .excellent { color: green; }
+    .verygood { color: blue; }
+    .good { color: goldenrod; }
+    .weak { color: red; }
+  </style>
+</head>
+<body>
+  <h1 id="studentTitle">نتيجة الطالب</h1>
+
+  <table id="gradesTable">
+    <tr>
+      <th>الحصة</th>
+      <th>الدرجة</th>
+    </tr>
+  </table>
+
+  <div id="final"></div>
+
+  <script>
+    const name = localStorage.getItem("studentName");
+    const grades = JSON.parse(localStorage.getItem("grades"));
+
+    document.getElementById("studentTitle").innerText = "نتيجة الطالب: " + name;
+
+    const table = document.getElementById("gradesTable");
+
+    let total = 0;
+    grades.forEach((grade, index) => {
+      total += grade;
+      let row = `<tr><td>الحصة ${index+1}</td><td>${grade} / 30</td></tr>`;
+      table.innerHTML += row;
+    });
+
+    let avg = total / grades.length;
+    let finalDiv = document.getElementById("final");
+
+    if (avg >= 27) {
+      finalDiv.innerHTML = `<span class="excellent">🌟 التقدير العام: ممتاز</span>`;
+    } else if (avg >= 23) {
+      finalDiv.innerHTML = `<span class="verygood">✅ التقدير العام: جيد جدًا</span>`;
+    } else if (avg >= 18) {
+      finalDiv.innerHTML = `<span class="good">ℹ️ التقدير العام: جيد</span>`;
+    } else {
+      finalDiv.innerHTML = `<span class="weak">⚠️ التقدير العام: ضعيف</span>`;
+    }
+  </script>
+</body>
+</html>
