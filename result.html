@@ -47,6 +47,11 @@
       margin-top: 10px;
       color: #333;
     }
+    .total {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #555;
+    }
     .excellent { color: green; }
     .verygood { color: blue; }
     .good { color: orange; }
@@ -87,6 +92,7 @@
 
           // حساب النسبة المئوية
           let percent = (total / maxTotal) * 100;
+          let totalText = `<div class="total">إجمالي الدرجات: ${total} / ${maxTotal}</div>`;
           let percentText = `<div class="percent">النسبة النهائية: ${percent.toFixed(2)}%</div>`;
           let status = "";
           if (percent >= 85) status = `<div class="grade excellent">ممتاز</div>`;
@@ -94,7 +100,7 @@
           else if (percent >= 50) status = `<div class="grade good">جيد</div>`;
           else status = `<div class="grade weak">ضعيف</div>`;
 
-          container.innerHTML = `<h2>${studentName}</h2>` + table + percentText + status;
+          container.innerHTML = `<h2>${studentName}</h2>` + table + totalText + percentText + status;
 
         } else {
           container.innerHTML = `<p style="color:red">⚠️ الطالب غير موجود</p>`;
