@@ -49,13 +49,13 @@
   </style>
 </head>
 <body>
-  <h1>نتيجة الطالب</h1>
+  <h1>📊 نتيجة الطالب</h1>
   <div id="studentResult"></div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const studentName = urlParams.get("name");
-    const className = urlParams.get("class");
+    const studentClass = urlParams.get("class");
 
     async function loadData() {
       try {
@@ -64,18 +64,18 @@
 
         const container = document.getElementById("studentResult");
 
-        if (data[studentName] && data[studentName][className]) {
-          const grades = data[studentName][className];
+        if (data[studentName] && data[studentName][studentClass]) {
+          const grades = data[studentName][studentClass];
 
-          let table = "<table><tr><th>الحصة</th><th>الدرجة</th></tr>";
+          let table = "<table><tr><th>المادة/الحصة</th><th>الدرجة</th></tr>";
           let total = 0, maxTotal = 0;
 
           grades.forEach((pair, i) => {
             const got = pair[0];
             const max = pair[1];
-            total += got;
-            maxTotal += max;
-            table += `<tr><td>الحصة ${i+1}</td><td>${got} / ${max}</td></tr>`;
+            if (got !== "-") total += got;
+            if (max !== "-") maxTotal += max;
+            table += `<tr><td>المادة ${i+1}</td><td>${got} / ${max}</td></tr>`;
           });
 
           table += "</table>";
@@ -87,10 +87,12 @@
           else if (percent >= 50) status = `<div class="grade good">جيد</div>`;
           else status = `<div class="grade weak">ضعيف</div>`;
 
-          container.innerHTML = `<h2>${studentName} - ${className}</h2>` + table + status;
+          container.innerHTML = `<h2>${studentName}</h2><h3>${studentClass}</h3>` + table + status;
+
         } else {
-          container.innerHTML = `<p style="color:red">⚠️ لم يتم العثور على بيانات لهذا الطالب أو الصف</p>`;
+          container.innerHTML = `<p style="color:red">⚠️ الطالب أو الصف غير موجود</p>`;
         }
+
       } catch (e) {
         console.error("Error loading data:", e);
       }
