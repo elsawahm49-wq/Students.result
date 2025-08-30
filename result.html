@@ -53,29 +53,35 @@
   <div id="studentResult"></div>
 
   <script>
-    // جلب اسم الطالب من الرابط
+    // قراءة الاسم من رابط الصفحة
     const urlParams = new URLSearchParams(window.location.search);
     const studentName = urlParams.get("name");
-    const container = document.getElementById("studentResult");
 
-    // تحميل ملف JSON
-    fetch("students_results.json")
-      .then(response => response.json())
-      .then(data => {
+    async function loadData() {
+      try {
+        const response = await fetch("students_results.json");
+        const data = await response.json();
+
+        const container = document.getElementById("studentResult");
+
         if (data[studentName]) {
           const grades = data[studentName];
-          let table = "<table><tr><th>الحصة</th><th>الدرجة</th></tr>";
-          let totalGot = 0, totalMax = 0;
 
-          grades.forEach((g, i) => {
-            table += `<tr><td>الحصة ${i+1}</td><td>${g[0]} / ${g[1]}</td></tr>`;
-            totalGot += g[0];
-            totalMax += g[1];
+          let table = "<table><tr><th>الحصة</th><th>الدرجة</th></tr>";
+          let total = 0, maxTotal = 0;
+
+          grades.forEach((pair, i) => {
+            const got = pair[0];
+            const max = pair[1];
+            total += got;
+            maxTotal += max;
+            table += `<tr><td>الحصة ${i+1}</td><td>${got} / ${max}</td></tr>`;
           });
+
           table += "</table>";
 
-          // حساب النسبة المئوية والتقدير
-          let percent = (totalGot / totalMax) * 100;
+          // حساب النسبة المئوية
+          let percent = (total / maxTotal) * 100;
           let status = "";
           if (percent >= 85) status = `<div class="grade excellent">ممتاز</div>`;
           else if (percent >= 70) status = `<div class="grade verygood">جيد جدًا</div>`;
@@ -83,13 +89,18 @@
           else status = `<div class="grade weak">ضعيف</div>`;
 
           container.innerHTML = `<h2>${studentName}</h2>` + table + status;
+
         } else {
-          container.innerHTML = `<p style="color:red">⚠️ الطالب غير موجود</p>`;
+          document.getElementById("studentResult").innerHTML = 
+            `<p style="color:red">⚠️ الطالب غير موجود</p>`;
         }
-      })
-      .catch(err => {
-        container.innerHTML = `<p style="color:red">خطأ في تحميل البيانات</p>`;
-      });
+
+      } catch (e) {
+        console.error("Error loading data:", e);
+      }
+    }
+
+    loadData();
   </script>
 </body>
 </html>
