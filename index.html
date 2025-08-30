@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>البحث عن الطالب</title>
+  <title>البحث عن نتيجة الطالب</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,64 +19,108 @@
       padding: 15px;
       margin: 0;
     }
+    .container {
+      margin-top: 50px;
+      position: relative;
+      display: inline-block;
+      width: 80%;
+      max-width: 400px;
+    }
     input {
+      width: 100%;
       padding: 10px;
-      margin: 20px auto;
-      width: 250px;
       font-size: 16px;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0 auto;
-      width: 300px;
-      text-align: right;
-      background: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      border: 1px solid #ccc;
       border-radius: 5px;
+      box-sizing: border-box;
     }
-    li {
+    .suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    .suggestions div {
       padding: 10px;
       cursor: pointer;
     }
-    li:hover {
-      background: #f1f1f1;
+    .suggestions div:hover {
+      background: #f0f0f0;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #34495e;
     }
   </style>
 </head>
 <body>
-  <h1>ابحث عن نتيجة الطالب</h1>
-  <input type="text" id="studentName" placeholder="اكتب اسم الطالب">
-  <ul id="suggestions"></ul>
+  <h1>البحث عن نتيجة الطالب</h1>
+  <div class="container">
+    <input type="text" id="studentInput" placeholder="اكتب اسم الطالب...">
+    <div id="suggestions" class="suggestions"></div>
+    <button onclick="goToResult()">عرض النتيجة</button>
+  </div>
 
   <script>
-    // أسماء الطلاب
-    const students = [
-      "أحمد علي","سارة محمد","محمود يوسف","ليلى خالد","عمر حسن",
-      "ندى إبراهيم","خالد سمير","فاطمة عمر","يوسف عادل","هبة شريف",
-      "إسلام فاروق","منة الله عماد","محمد طارق","ريم عصام","عبدالله كريم",
-      "حنان محمود","أدهم ياسر","شهد وليد","بلال أحمد","إسراء جمال"
-    ];
+    let students = [];
 
-    const input = document.getElementById("studentName");
-    const suggestions = document.getElementById("suggestions");
-
-    input.addEventListener("input", function() {
-      let query = this.value.trim();
-      suggestions.innerHTML = "";
-
-      if (query.length > 0) {
-        let matches = students.filter(s => s.includes(query));
-        matches.forEach(name => {
-          let li = document.createElement("li");
-          li.textContent = name;
-          li.onclick = () => {
-            window.location.href = "result.html?name=" + encodeURIComponent(name);
-          };
-          suggestions.appendChild(li);
-        });
+    // تحميل أسماء الطلاب من ملف JSON
+    async function loadStudents() {
+      try {
+        const response = await fetch("students_results.json");
+        const data = await response.json();
+        students = Object.keys(data);
+      } catch (e) {
+        console.error("Error loading students:", e);
       }
+    }
+
+    // إظهار الاقتراحات أثناء الكتابة
+    document.getElementById("studentInput").addEventListener("input", function() {
+      const input = this.value.trim();
+      const suggestionsBox = document.getElementById("suggestions");
+      suggestionsBox.innerHTML = "";
+
+      if (input.length === 0) return;
+
+      const matches = students.filter(name => name.includes(input));
+      matches.forEach(name => {
+        const div = document.createElement("div");
+        div.textContent = name;
+        div.onclick = function() {
+          document.getElementById("studentInput").value = name;
+          suggestionsBox.innerHTML = "";
+        };
+        suggestionsBox.appendChild(div);
+      });
     });
+
+    // الانتقال لصفحة النتيجة
+    function goToResult() {
+      const studentName = document.getElementById("studentInput").value.trim();
+      if (studentName && students.includes(studentName)) {
+        window.location.href = "result.html?name=" + encodeURIComponent(studentName);
+      } else {
+        alert("⚠️ من فضلك اختر اسم صحيح من القائمة");
+      }
+    }
+
+    loadStudents();
   </script>
 </body>
 </html>
