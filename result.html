@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>نتيجة الطالب</title>
   <style>
     body {
@@ -46,32 +46,11 @@
     .verygood { color: blue; }
     .good { color: orange; }
     .weak { color: red; }
-
-    /* زرار الرجوع */
-    .back-btn {
-      display: inline-block;
-      margin: 25px auto;
-      padding: 12px 25px;
-      font-size: 18px;
-      font-weight: bold;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-      text-decoration: none;
-    }
-    .back-btn:hover {
-      background: #1a242f;
-    }
   </style>
 </head>
 <body>
   <h1>📊 نتيجة الطالب</h1>
   <div id="studentResult"></div>
-
-  <a href="index.html" class="back-btn">🔙 رجوع للبحث</a>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -97,7 +76,7 @@
         if (data[studentName] && data[studentName][studentClass]) {
           const grades = data[studentName][studentClass];
 
-          let table = "<table><tr><th>المادة/الحصة</th><th>الدرجة</th></tr>";
+          let table = "<table><tr><th>المادة</th><th>الدرجة</th></tr>";
           let total = 0, maxTotal = 0;
 
           grades.forEach((pair, i) => {
@@ -105,25 +84,23 @@
             const max = pair[1];
             if (got !== "-") total += got;
             if (max !== "-") maxTotal += max;
-            table += `<tr><td>المادة ${i+1}</td><td>${got} / ${max}</td></tr>`;
+            table += `<tr><td>المادة ${i + 1}</td><td>${got} / ${max}</td></tr>`;
           });
 
-          let percent = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
-
-          table += `
-            <tr style="font-weight:bold; background:#eef;">
-              <td>📌 المجموع الكلي</td>
-              <td>${total} / ${maxTotal} (${percent.toFixed(2)}%)</td>
-            </tr>
-          `;
-
-          table += "</table>";
-
+          const percent = (total / maxTotal) * 100;
           let status = "";
-          if (percent >= 85) status = `<div class="grade excellent">ممتاز</div>`;
-          else if (percent >= 70) status = `<div class="grade verygood">جيد جدًا</div>`;
-          else if (percent >= 50) status = `<div class="grade good">جيد</div>`;
-          else status = `<div class="grade weak">ضعيف</div>`;
+
+          if (percent >= 85) status = `<div class="grade excellent">🌟 ممتاز</div>`;
+          else if (percent >= 70) status = `<div class="grade verygood">👍 جيد جدًا</div>`;
+          else if (percent >= 50) status = `<div class="grade good">🙂 جيد</div>`;
+          else status = `<div class="grade weak">⚠️ ضعيف</div>`;
+
+          // أضف المجموع والنسبة المئوية
+          table += `
+            <tr><th>المجموع</th><td>${total} / ${maxTotal}</td></tr>
+            <tr><th>النسبة المئوية</th><td>${percent.toFixed(2)}%</td></tr>
+          `;
+          table += "</table>";
 
           container.innerHTML = `
             <h2>${studentName}</h2>
@@ -131,13 +108,14 @@
             ${table}
             ${status}
           `;
-
         } else {
-          container.innerHTML = `<p style="color:red">⚠️ الطالب أو الصف غير موجود</p>`;
+          container.innerHTML = `<p style="color:red; font-weight:bold;">⚠️ الطالب أو الصف الدراسي غير موجود. تأكد من صحة البيانات.</p>`;
         }
 
       } catch (e) {
         console.error("Error loading data:", e);
+        document.getElementById("studentResult").innerHTML =
+          "<p style='color:red; font-weight:bold;'>❌ حدث خطأ أثناء تحميل البيانات</p>";
       }
     }
 
