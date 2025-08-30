@@ -53,56 +53,43 @@
   <div id="studentResult"></div>
 
   <script>
-    // بيانات الطلاب: كل طالب له 8 حصص (الدرجات من 30)
-    const studentGrades = {
-      "أحمد علي": [28, 27, 29, 30, 25, 26, 30, 27],
-      "سارة محمد": [20, 22, 21, 23, 24, 22, 20, 25],
-      "محمود يوسف": [15, 18, 17, 20, 19, 18, 16, 17],
-      "ليلى خالد": [10, 12, 11, 14, 15, 13, 12, 10],
-      "عمر حسن": [19, 20, 21, 22, 18, 20, 19, 21],
-      "ندى إبراهيم": [30, 29, 30, 28, 30, 30, 29, 30],
-      "خالد سمير": [8, 10, 12, 9, 11, 10, 13, 12],
-      "فاطمة عمر": [17, 18, 16, 19, 17, 18, 20, 19],
-      "يوسف عادل": [25, 26, 24, 23, 27, 25, 26, 28],
-      "هبة شريف": [18, 19, 20, 21, 22, 18, 20, 19],
-      "إسلام فاروق": [13, 15, 14, 16, 13, 12, 14, 15],
-      "منة الله عماد": [28, 27, 29, 30, 28, 27, 29, 30],
-      "محمد طارق": [20, 21, 22, 19, 20, 22, 23, 21],
-      "ريم عصام": [11, 12, 13, 10, 14, 12, 13, 11],
-      "عبدالله كريم": [17, 16, 18, 19, 17, 18, 16, 17],
-      "حنان محمود": [26, 25, 27, 28, 26, 25, 27, 28],
-      "أدهم ياسر": [9, 10, 11, 8, 12, 10, 11, 9],
-      "شهد وليد": [23, 24, 22, 25, 23, 24, 22, 23],
-      "بلال أحمد": [30, 30, 29, 30, 28, 30, 29, 30],
-      "إسراء جمال": [22, 21, 23, 22, 24, 23, 21, 22]
-    };
-
-    // قراءة الاسم من الرابط
+    // جلب اسم الطالب من الرابط
     const urlParams = new URLSearchParams(window.location.search);
     const studentName = urlParams.get("name");
-
     const container = document.getElementById("studentResult");
 
-    if (studentGrades[studentName]) {
-      const grades = studentGrades[studentName];
-      let table = "<table><tr><th>الحصة</th><th>الدرجة / 30</th></tr>";
-      grades.forEach((g, i) => {
-        table += `<tr><td>الحصة ${i+1}</td><td>${g} / 30</td></tr>`;
+    // تحميل ملف JSON
+    fetch("students_results.json")
+      .then(response => response.json())
+      .then(data => {
+        if (data[studentName]) {
+          const grades = data[studentName];
+          let table = "<table><tr><th>الحصة</th><th>الدرجة</th></tr>";
+          let totalGot = 0, totalMax = 0;
+
+          grades.forEach((g, i) => {
+            table += `<tr><td>الحصة ${i+1}</td><td>${g[0]} / ${g[1]}</td></tr>`;
+            totalGot += g[0];
+            totalMax += g[1];
+          });
+          table += "</table>";
+
+          // حساب النسبة المئوية والتقدير
+          let percent = (totalGot / totalMax) * 100;
+          let status = "";
+          if (percent >= 85) status = `<div class="grade excellent">ممتاز</div>`;
+          else if (percent >= 70) status = `<div class="grade verygood">جيد جدًا</div>`;
+          else if (percent >= 50) status = `<div class="grade good">جيد</div>`;
+          else status = `<div class="grade weak">ضعيف</div>`;
+
+          container.innerHTML = `<h2>${studentName}</h2>` + table + status;
+        } else {
+          container.innerHTML = `<p style="color:red">⚠️ الطالب غير موجود</p>`;
+        }
+      })
+      .catch(err => {
+        container.innerHTML = `<p style="color:red">خطأ في تحميل البيانات</p>`;
       });
-      table += "</table>";
-
-      // حساب المتوسط عشان التقدير العام
-      let avg = grades.reduce((a,b)=>a+b,0) / grades.length;
-      let status = "";
-      if (avg >= 25) status = `<div class="grade excellent">ممتاز</div>`;
-      else if (avg >= 20) status = `<div class="grade verygood">جيد جدًا</div>`;
-      else if (avg >= 15) status = `<div class="grade good">جيد</div>`;
-      else status = `<div class="grade weak">ضعيف</div>`;
-
-      container.innerHTML = `<h2>${studentName}</h2>` + table + status;
-    } else {
-      container.innerHTML = `<p style="color:red">⚠️ الطالب غير موجود</p>`;
-    }
   </script>
 </body>
 </html>
