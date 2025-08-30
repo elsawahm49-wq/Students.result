@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif;
       direction: rtl;
       text-align: center;
-      background: #f9f9f9;
+      background: #f4f4f4;
       margin: 0;
       padding: 0;
     }
@@ -17,7 +17,7 @@
       background: #2c3e50;
       color: white;
       padding: 15px;
-      margin: 0 0 20px 0;
+      margin: 0;
     }
     table {
       margin: 20px auto;
@@ -35,57 +35,73 @@
       color: white;
     }
     tr:nth-child(even) {
-      background: #f4f4f4;
+      background: #f9f9f9;
     }
-    #final {
-      margin-top: 20px;
+    .grade {
       font-size: 22px;
+      margin-top: 20px;
       font-weight: bold;
     }
     .excellent { color: green; }
     .verygood { color: blue; }
-    .good { color: goldenrod; }
+    .good { color: orange; }
     .weak { color: red; }
   </style>
 </head>
 <body>
-  <h1 id="studentTitle">نتيجة الطالب</h1>
-
-  <table id="gradesTable">
-    <tr>
-      <th>الحصة</th>
-      <th>الدرجة</th>
-    </tr>
-  </table>
-
-  <div id="final"></div>
+  <h1>نتيجة الطالب</h1>
+  <div id="studentResult"></div>
 
   <script>
-    const name = localStorage.getItem("studentName");
-    const grades = JSON.parse(localStorage.getItem("grades"));
+    // بيانات الطلاب: كل طالب له 8 حصص (الدرجات من 30)
+    const studentGrades = {
+      "أحمد علي": [28, 27, 29, 30, 25, 26, 30, 27],
+      "سارة محمد": [20, 22, 21, 23, 24, 22, 20, 25],
+      "محمود يوسف": [15, 18, 17, 20, 19, 18, 16, 17],
+      "ليلى خالد": [10, 12, 11, 14, 15, 13, 12, 10],
+      "عمر حسن": [19, 20, 21, 22, 18, 20, 19, 21],
+      "ندى إبراهيم": [30, 29, 30, 28, 30, 30, 29, 30],
+      "خالد سمير": [8, 10, 12, 9, 11, 10, 13, 12],
+      "فاطمة عمر": [17, 18, 16, 19, 17, 18, 20, 19],
+      "يوسف عادل": [25, 26, 24, 23, 27, 25, 26, 28],
+      "هبة شريف": [18, 19, 20, 21, 22, 18, 20, 19],
+      "إسلام فاروق": [13, 15, 14, 16, 13, 12, 14, 15],
+      "منة الله عماد": [28, 27, 29, 30, 28, 27, 29, 30],
+      "محمد طارق": [20, 21, 22, 19, 20, 22, 23, 21],
+      "ريم عصام": [11, 12, 13, 10, 14, 12, 13, 11],
+      "عبدالله كريم": [17, 16, 18, 19, 17, 18, 16, 17],
+      "حنان محمود": [26, 25, 27, 28, 26, 25, 27, 28],
+      "أدهم ياسر": [9, 10, 11, 8, 12, 10, 11, 9],
+      "شهد وليد": [23, 24, 22, 25, 23, 24, 22, 23],
+      "بلال أحمد": [30, 30, 29, 30, 28, 30, 29, 30],
+      "إسراء جمال": [22, 21, 23, 22, 24, 23, 21, 22]
+    };
 
-    document.getElementById("studentTitle").innerText = "نتيجة الطالب: " + name;
+    // قراءة الاسم من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentName = urlParams.get("name");
 
-    const table = document.getElementById("gradesTable");
+    const container = document.getElementById("studentResult");
 
-    let total = 0;
-    grades.forEach((grade, index) => {
-      total += grade;
-      let row = `<tr><td>الحصة ${index+1}</td><td>${grade} / 30</td></tr>`;
-      table.innerHTML += row;
-    });
+    if (studentGrades[studentName]) {
+      const grades = studentGrades[studentName];
+      let table = "<table><tr><th>الحصة</th><th>الدرجة / 30</th></tr>";
+      grades.forEach((g, i) => {
+        table += `<tr><td>الحصة ${i+1}</td><td>${g} / 30</td></tr>`;
+      });
+      table += "</table>";
 
-    let avg = total / grades.length;
-    let finalDiv = document.getElementById("final");
+      // حساب المتوسط عشان التقدير العام
+      let avg = grades.reduce((a,b)=>a+b,0) / grades.length;
+      let status = "";
+      if (avg >= 25) status = `<div class="grade excellent">ممتاز</div>`;
+      else if (avg >= 20) status = `<div class="grade verygood">جيد جدًا</div>`;
+      else if (avg >= 15) status = `<div class="grade good">جيد</div>`;
+      else status = `<div class="grade weak">ضعيف</div>`;
 
-    if (avg >= 27) {
-      finalDiv.innerHTML = `<span class="excellent">🌟 التقدير العام: ممتاز</span>`;
-    } else if (avg >= 23) {
-      finalDiv.innerHTML = `<span class="verygood">✅ التقدير العام: جيد جدًا</span>`;
-    } else if (avg >= 18) {
-      finalDiv.innerHTML = `<span class="good">ℹ️ التقدير العام: جيد</span>`;
+      container.innerHTML = `<h2>${studentName}</h2>` + table + status;
     } else {
-      finalDiv.innerHTML = `<span class="weak">⚠️ التقدير العام: ضعيف</span>`;
+      container.innerHTML = `<p style="color:red">⚠️ الطالب غير موجود</p>`;
     }
   </script>
 </body>
