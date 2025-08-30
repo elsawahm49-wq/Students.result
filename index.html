@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>البحث عن الطالب</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      text-align: center;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      margin: 0;
+    }
+    input {
+      padding: 10px;
+      margin: 20px auto;
+      width: 250px;
+      font-size: 16px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      width: 300px;
+      text-align: right;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+    li {
+      padding: 10px;
+      cursor: pointer;
+    }
+    li:hover {
+      background: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <h1>ابحث عن نتيجة الطالب</h1>
+  <input type="text" id="studentName" placeholder="اكتب اسم الطالب">
+  <ul id="suggestions"></ul>
+
+  <script>
+    // أسماء الطلاب
+    const students = [
+      "أحمد علي","سارة محمد","محمود يوسف","ليلى خالد","عمر حسن",
+      "ندى إبراهيم","خالد سمير","فاطمة عمر","يوسف عادل","هبة شريف",
+      "إسلام فاروق","منة الله عماد","محمد طارق","ريم عصام","عبدالله كريم",
+      "حنان محمود","أدهم ياسر","شهد وليد","بلال أحمد","إسراء جمال"
+    ];
+
+    const input = document.getElementById("studentName");
+    const suggestions = document.getElementById("suggestions");
+
+    input.addEventListener("input", function() {
+      let query = this.value.trim();
+      suggestions.innerHTML = "";
+
+      if (query.length > 0) {
+        let matches = students.filter(s => s.includes(query));
+        matches.forEach(name => {
+          let li = document.createElement("li");
+          li.textContent = name;
+          li.onclick = () => {
+            window.location.href = "result.html?name=" + encodeURIComponent(name);
+          };
+          suggestions.appendChild(li);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
